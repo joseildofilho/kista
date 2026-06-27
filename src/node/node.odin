@@ -49,13 +49,13 @@ get_ptr :: proc(node: ^Node, idx: u16) -> u64 {
 	return value
 }
 
-set_offset :: proc(node: ^Node, idx: u16, value: u16) {
+set_offset :: #force_inline proc(node: ^Node, idx: u16, value: u16) {
 	assert(n_keys(node) > idx)
 	pos := 4 + 8 * n_keys(node) + idx * 2
 	endian.put_u16(node[pos:], .Big, value)
 }
 
-get_offset :: proc(node: ^Node, idx: u16) -> u16 {
+get_offset :: #force_inline proc(node: ^Node, idx: u16) -> u16 {
 	assert(n_keys(node) > idx)
 	pos := 4 + 8 * n_keys(node) + idx * 2
 	value, _ := endian.get_u16(node[pos:], .Big)
