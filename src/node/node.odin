@@ -61,3 +61,25 @@ get_offset :: #force_inline proc(node: ^Node, idx: u16) -> u16 {
 	value, _ := endian.get_u16(node[pos:], .Big)
 	return value
 }
+
+kv_pos :: #force_inline proc(node: ^Node, idx: u16) -> u16 {
+	assert(idx <= n_keys(node))
+	return 4 + 8 * n_keys(node) + 2 * n_keys(node) + get_offset(node, idx)
+}
+
+get_key :: #force_inline proc(node: ^Node, idx: u16) -> []u8 {
+	assert(idx <= n_keys(node))
+	pos := kv_pos(node, idx)
+	klen, _ := endian.get_u16(node[pos:], .Big)
+	return node[pos:][:klen]
+}
+
+get_value :: #force_inline proc(node: ^Node, idx: u16) -> []u8 {
+	assert(idx <= n_keys(node))
+	pos := kv_pos(node, idx)
+
+	klen, _ := endian.get_u16(node[pos:], .Big)
+	vlen, _ := endian.get_u16(node[pos + 2:], .Big)
+
+	return node[pos + 4 + klen:][:vlen]
+}
